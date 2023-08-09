@@ -1,21 +1,17 @@
 <?php
-require_once("./Database.php");
-$res = $database->read();
+$mysqli = require_once("./database.php");
+$database = new Database("localhost", "root", "", "login_db");
+$mysqli = $database->getConnection();
+
 if (isset($_GET['id']) && !empty($_GET['id'])) {
     $id = $_GET['id'];
-    $res->deleteRecord($id);
-     $servername = "localhost";
-   $username   = "root";
-   $password   = "";
-   $database   = "mydb";
-  $this->connection = mysqli_connect('localhost', 'root', '', 'mydb');
-  
-    $sql = "DELETE INTO CUSTOMER (Name, Email, Program, Course, GPA) VALUES ('$Name', '$Email','$Program', '$Course', '$GPA' )";
-    $res = mysqli_query($this->connection, $sql);
+    $query = "DELETE FROM user WHERE id = '$id'";
+    $result = $mysqli->query($query);
     
-  }
-  header("location:/mydb/index.php");
-  exit;
-  
-  
-  ?>
+    if ($result) {
+        header("Location: index.php?msg3=delete");
+    } else {
+        echo "Record does not delete. Try again";
+    }
+}
+?>

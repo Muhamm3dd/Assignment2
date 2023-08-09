@@ -1,84 +1,92 @@
+
 <?php
+$mysqli = require_once("./database.php");
+$database = new Database("localhost", "root", "", "login_db");
+$mysqli = $database->getConnection();
 
-// Include database file
-include 'database.php';
-
-$customerObj = new database();
 
 // Edit customer record
-if(isset($_GET['editId']) && !empty($_GET['editId'])) {
+if (isset($_GET['editId']) && !empty($_GET['editId'])) {
   $editId = $_GET['editId'];
-  $customer = $customerObj->displayRecordById($editId);
+  $database = $database->displayRecordById($editId);
 }
 
 // Update Record in customer table
-if(isset($_POST['update'])) {
-  $customerObj->updateRecord($_POST);
+if (isset($_POST['update'])) {
+  $database->updateRecord($_POST);
+  header("locaion:/mydb/index.php");
+  exit;
 }
 
+// Edit customer record
+if (isset($_POST['update'])) {
+    $id = $_POST['id'];
+    $name = $_POST['uname'];
+    $email = $_POST['uemail'];
+
+    // Perform the database update
+    $connection = mysqli_connect('localhost', 'root', '', 'login_db');
+    $sql = "UPDATE user SET name = '$name', email = '$email' WHERE id = $id";
+    $mysqli = mysqli_query($connection, $sql);
+
+    // Redirect back to the index.php after the update
+    header("location: /mydb/index.php");
+    exit;
+}
 ?>
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>CRUD With PDO</title>
-  <meta name="description" content="This week we will be building a CREATE and READ CRUD system with PDO">
-  <meta name="robots" content="noindex, nofollow">
-  <!--  Add our Google fonts  -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Roboto:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
-  <!--  Add our Bootstrap  -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" >
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <!--  Add our custom CSS  -->
-  <link rel="stylesheet" href="./css/style.css">
-  <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"/>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>replit</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">   
 </head>
+
 <body>
-  <header>
-    <h1>Full CRUD With OOP | Edit</h1>
-  </header>
-  <section class="container">
-    <div class="row">
-      <div class="col-md-5 mx-auto">
-        <div class="card">
-          <div class="card-header bg-primary">
-          <h4 class="text-white">Update Records</h4>
-          </div>
-          <div class="card-body bg-light">
-            <form action="edit.php" method="POST">
-              <div class="form-group">
-                <label for="Name">Name:</label>
-                <input type="text" class="form-control" name="Name" value="<?php echo $customer['Name']; ?>" required="">
-              </div>
-              <div class="form-group">
-                <label for="Email">Email</label>
-                <input type="email" class="form-control" name="Email" value="<?php echo $customer['Email']; ?>" required="">
-              </div>
-              <div class="form-group">
-                <label for="Program">Program:</label>
-                <input type="text" class="form-control" name="program" value="<?php echo $customer['Program']; ?>" required="">
-              </div>
-              <div class="form-group">
-                <label for="Corse">Course:</label>
-                <input type="text" class="form-control" name="Course" value="<?php echo $customer['Course']; ?>" required="">
-              </div>
-              <div class="form-group">
-                <label for="GPA">Previous Result:</label>
-                <input type="text" class="form-control" name="GPA" value="<?php echo $customer['GPA']; ?>" required="">
-              </div>
-              <div class="form-group">
-                <input type="hidden" name="id" value="<?php echo $customer['id']; ?>">
-                <input type="submit" name="update" class="btn btn-primary" style="float:right;" value="Update">
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
+    <div class="link">
+        <a href="View.php">View</a>
     </div>
-  </section>
+    <div class="name">
+        <div class="title">
+            <h1>Update Records</h1>
+        </div>
+
+        <div class="line">
+            <hr>
+        </div>
+        <?php
+             $sql = "SELECT id, name, email FROM user";
+             $result = $mysqli->query($sql);
+             
+             while ($user = $result->fetch_assoc()) {
+                 // Rest of the code for displaying users
+             
+             
+            
+			?>
+
+            <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
+                <label for="name">First name:</label><br>
+                <input type="text" id="name" name="uname" value="<?php echo $user['name'] ; ?>" required=""><br>
+                
+                <label for="email">Enter your email:</label><br>
+                <input type="email" id="email" name="uemail" value="<?php echo $user['email']; ?>" required=""><br>
+
+                <input type="hidden" name="id" value="<?php echo $user['id']; ?>">
+                <input type="submit" id="submit" name="update" value="Update">
+            </form>
+            <?php } ?>
+
+        <div class="horizon">
+            <hr>
+        </div>
+
+    </div>
+
 </body>
+
 </html>
